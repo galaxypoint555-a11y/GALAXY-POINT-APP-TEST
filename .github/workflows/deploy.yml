@@ -1,0 +1,53 @@
+name: Deploy Galaxy Point PWA Testing
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: galaxy-point-pwa-pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout test repository
+        uses: actions/checkout@v4
+      - name: Generate PNG app icons
+        run: |
+          python3 -m pip install --user Pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw, ImageFont
+          for size in (180,192,512):
+              image=Image.new("RGB",(size,size),"#302018")
+              draw=ImageDraw.Draw(image)
+              w=size
+              draw.rounded_rectangle((0,0,w-1,w-1),radius=int(size*.20),fill="#302018")
+              draw.ellipse((int(w*.13),int(w*.13),int(w*.87),int(w*.87)),outline="#c5a475",width=max(2,int(w*.02)))
+              try:
+                  font=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",int(w*.27))
+                  small=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",int(w*.038))
+              except OSError:
+                  font=ImageFont.load_default()
+                  small=font
+              draw.text((w*.5,w*.50),"GP",anchor="mm",font=font,fill="#faf7f2")
+              draw.text((w*.5,w*.70),"KHARGHAR",anchor="mm",font=small,fill="#c5a475")
+              image.save("apple-touch-icon.png" if size==180 else f"icon-{size}.png",optimize=True)
+          PY
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Upload PWA
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy PWA
+        id: deployment
+        uses: actions/deploy-pages@v4
