@@ -439,7 +439,7 @@ body.gp-welcome-locked{overflow:hidden}
   try{
    const cfg=window.GP_CONFIG||{};
    if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw Error('Customer registration service is unavailable');
-   const response=await fetch(cfg.supabaseUrl.replace(/\\/$/,'')+'/rest/v1/customer_login_events',{
+   const response=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/customer_login_events',{
     method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},
     body:JSON.stringify({customer_name:value.name,phone:value.phone,source:'mobile_login'})
    });
