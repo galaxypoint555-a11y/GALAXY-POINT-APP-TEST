@@ -327,6 +327,18 @@ async function gpLoadSiteSettings(){
   }
   appNotice.textContent=announcement.slice(0,220);
   appNotice.style.display=announcement.trim()?'block':'none';
+  // Staff-managed app homepage headline and button; never changes website hero.
+  const appHero=settings.app_hero&&typeof settings.app_hero==='object'?settings.app_hero:{};
+  let appHeroEl=document.getElementById('gp-app-custom-hero');
+  if(!appHeroEl){appHeroEl=document.createElement('section');appHeroEl.id='gp-app-custom-hero';appHeroEl.style.cssText='text-align:center;padding:22px 18px;max-width:960px;margin:auto;display:none';document.body.insertBefore(appHeroEl,appNotice.nextSibling)}
+  appHeroEl.replaceChildren();
+  const addHeroLine=(tag,value,css)=>{if(!value)return;const el=document.createElement(tag);el.textContent=String(value).slice(0,200);el.style.cssText=css;appHeroEl.appendChild(el)};
+  addHeroLine('p',appHero.kicker,'font-size:12px;letter-spacing:2px;text-transform:uppercase');
+  addHeroLine('h2',appHero.title,'font-size:clamp(24px,5vw,38px);margin:8px 0');
+  addHeroLine('p',appHero.subtitle,'font-size:15px;opacity:.85');
+  if(appHero.cta){const btn=document.createElement('button');btn.textContent=String(appHero.cta).slice(0,35);btn.style.cssText='padding:12px 24px;background:#17243d;color:white;border:0;border-radius:10px;margin:12px;cursor:pointer';btn.addEventListener('click',()=>{if(typeof go==='function')go('shop');else location.hash='shop'});appHeroEl.appendChild(btn)}
+  appHeroEl.style.display=page==='home'&&['title','subtitle','kicker','cta'].some(k=>appHero[k])?'block':'none';
+
   // App-only visual assets; website settings and shared catalog remain untouched.
   const validMedia=url=>typeof url==='string'&&/^https:\/\//i.test(url)?url:'';
   let appMedia=document.getElementById('gp-app-home-media');
