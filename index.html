@@ -431,11 +431,20 @@ body.gp-welcome-locked{overflow:hidden}
  function unlock(){gate.hidden=true;document.body.classList.remove('gp-welcome-locked')}
  if(valid(profile))unlock();else lock();
  phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'').slice(0,10)});
- form.addEventListener('submit',event=>{
+ form.addEventListener('submit',async event=>{
   event.preventDefault();
   const value={name:name.value.trim().replace(/\s+/g,' '),phone:phone.value.trim()};
   if(value.name.length<2){error.textContent='Please enter your full name (at least 2 characters).';name.focus();return}
   if(!/^[0-9]{10}$/.test(value.phone)){error.textContent='Please enter a valid 10-digit mobile number.';phone.focus();return}
-  try{localStorage.setItem(key,JSON.stringify(value));unlock()}catch(e){error.textContent='Could not save your details on this device. Please enable browser storage.'}
+  try{
+   const cfg=window.GP_CONFIG||{};
+   if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)throw Error('Customer registration service is unavailable');
+   const response=await fetch(cfg.supabaseUrl.replace(/\\/$/,'')+'/rest/v1/customer_login_events',{
+    method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},
+    body:JSON.stringify({customer_name:value.name,phone:value.phone,source:'mobile_login'})
+   });
+   if(!response.ok)throw Error('Unable to register your visit ('+response.status+'). Please try again.');
+   localStorage.setItem(key,JSON.stringify(value));unlock();
+  }catch(e){error.textContent=e.message||'Unable to save login. Please try again.'}
  });
 })();</script></body></html>
