@@ -1,5 +1,5 @@
 /* Galaxy Point PWA — automatic updates. Network-first HTML, safe offline fallback. */
-const CACHE='galaxy-point-pwa-shell-v4';
+const CACHE='galaxy-point-pwa-shell-v5';
 const SHELL=['./','./index.html','./manifest.webmanifest','./pwa-icon.svg'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
