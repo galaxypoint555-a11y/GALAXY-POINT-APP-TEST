@@ -314,6 +314,20 @@ async function gpLoadSiteSettings(){
   const settingsChanged=settingsSignature!==window.gpSettingsSignature;
   window.gpSettingsSignature=settingsSignature;
   window.gpPublishedSettings=settings;
+  // App-only announcement controlled by Staff Panel; no website content changes.
+  let appNotice=document.getElementById('gp-app-only-announcement');
+  const rawNotice=settings.app_announcement;
+  const announcement=typeof rawNotice==='string'?rawNotice:(typeof rawNotice?.text==='string'?rawNotice.text:'');
+  if(!appNotice){
+   appNotice=document.createElement('div');
+   appNotice.id='gp-app-only-announcement';
+   appNotice.setAttribute('role','status');
+   appNotice.style.cssText='position:relative;z-index:5;background:#eef2ff;color:#17243d;text-align:center;padding:12px 18px;font:600 14px/1.5 system-ui,sans-serif;white-space:pre-wrap;display:none';
+   document.body.prepend(appNotice);
+  }
+  appNotice.textContent=announcement.slice(0,220);
+  appNotice.style.display=announcement.trim()?'block':'none';
+
   if(settings.category_images&&typeof settings.category_images==='object'){
    for(const name of ['iPhone','Samsung','Laptops']){
     const url=settings.category_images[name];
