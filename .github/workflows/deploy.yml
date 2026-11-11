@@ -25,7 +25,7 @@ jobs:
           python3 - <<'PY'
           import cairosvg
           for size in (180, 192, 512):
-              filename = 'apple-touch-icon-v2.png' if size == 180 else f'gp-icon-{size}-v2.png'
+              filename = 'apple-touch-icon-v3.png' if size == 180 else f'gp-icon-{size}-v3.png'
               cairosvg.svg2png(url='pwa-icon.svg', write_to=filename, output_width=size, output_height=size)
               print('Generated official GP logo:', filename)
           PY
