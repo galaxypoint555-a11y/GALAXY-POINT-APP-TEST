@@ -1,5 +1,5 @@
 /* Galaxy Point PWA testing build. Network-first shell, no API/customer data caching. */
-const CACHE='galaxy-point-pwa-shell-v1';
+const CACHE='galaxy-point-pwa-shell-v2';
 const SHELL=['./','./index.html','./manifest.webmanifest','./pwa-icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('galaxy-point-pwa-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
