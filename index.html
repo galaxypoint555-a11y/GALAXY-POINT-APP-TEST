@@ -327,6 +327,25 @@ async function gpLoadSiteSettings(){
   }
   appNotice.textContent=announcement.slice(0,220);
   appNotice.style.display=announcement.trim()?'block':'none';
+  // App-only visual assets; website settings and shared catalog remain untouched.
+  const validMedia=url=>typeof url==='string'&&/^https:\/\//i.test(url)?url:'';
+  let appMedia=document.getElementById('gp-app-home-media');
+  if(!appMedia){appMedia=document.createElement('div');appMedia.id='gp-app-home-media';appMedia.style.cssText='max-width:960px;margin:10px auto;padding:0 14px;display:none';document.body.insertBefore(appMedia,appNotice.nextSibling)}
+  const appBanner=validMedia(settings.app_banner_url);
+  const appVideo=validMedia(settings.app_hero_video_url);
+  const mediaSignature=JSON.stringify([appBanner,appVideo]);
+  if(appMedia.dataset.signature!==mediaSignature){
+   appMedia.dataset.signature=mediaSignature;
+   appMedia.replaceChildren();
+   if(appBanner){const img=document.createElement('img');img.src=appBanner;img.alt='Galaxy Point app offer';img.style.cssText='display:block;width:100%;height:auto;border-radius:14px;margin-bottom:10px';appMedia.appendChild(img)}
+   if(appVideo){const vid=document.createElement('video');vid.src=appVideo;vid.controls=true;vid.playsInline=true;vid.muted=true;vid.style.cssText='display:block;width:100%;max-height:400px;border-radius:14px';appMedia.appendChild(vid)}
+  }
+  appMedia.style.display=page==='home'&&(appBanner||appVideo)?'block':'none';
+  const appCategories=settings.app_category_images;
+  if(appCategories&&typeof appCategories==='object'){
+   for(const name of ['iPhone','Samsung','Laptops'])if(validMedia(appCategories[name]))categoryImages[name]=appCategories[name];
+  }
+
 
   if(settings.category_images&&typeof settings.category_images==='object'){
    for(const name of ['iPhone','Samsung','Laptops']){
